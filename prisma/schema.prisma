@@ -1,0 +1,259 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Email {
+  id        Int           @id @default(autoincrement()) @db.UnsignedInt
+  user      String        @unique(map: "user") @db.VarChar(128)
+  password  String        @db.VarChar(32)
+  status    email_status? @default(newly)
+  createdAt DateTime      @default(now()) @db.DateTime(6)
+  updatedAt DateTime      @default(now()) @db.DateTime(6)
+  usedTime  DateTime?
+  provider  String        @db.VarChar(32)
+
+  @@map("email")
+}
+
+model YoutubeVideo {
+  id               Int                           @id @default(autoincrement()) @db.UnsignedInt
+  categoryId       Int                           @default(0)
+  author           String?                       @db.VarChar(128)
+  title            String                        @db.VarChar(256)
+  videoId          String                        @unique(map: "videoId") @db.VarChar(16)
+  thumbnailUrl     String?                       @db.VarChar(256)
+  duration         String?                       @db.VarChar(64)
+  durationSec      Int?
+  syncStatus       YoutubeVideoSyncStatus?       @default(waiting)
+  syncedAt         DateTime?                     @db.DateTime(0)
+  createdAt        DateTime                      @default(now()) @db.DateTime(6)
+  updatedAt        DateTime                      @default(now()) @db.DateTime(6)
+  contentLength    String?                       @db.VarChar(32)
+  cosLocation      String?                       @db.VarChar(128)
+  height           Int?
+  itag             Int?
+  width            Int?
+  fsLocation       String?                       @db.VarChar(128)
+  preprocessStatus YoutubeVideoPreprocessStatus? @default(waiting)
+  quality          String?                       @db.VarChar(32)
+  durationMs       Int?
+  failedReason     String?                       @db.VarChar(64)
+
+  @@map("youtube_video")
+}
+
+model YoutubeVideoCategory {
+  id                 Int                            @id @default(autoincrement()) @db.UnsignedInt
+  name               String                         @db.VarChar(128)
+  code               String                         @db.VarChar(128)
+  iconPath           String?                        @db.VarChar(128)
+  totalDurationHours Int                            @default(0)
+  qidianyunParams    String?                        @db.VarChar(1024)
+  source             YoutubeVideoCategorySource?    @default(default)
+  videoMode          YoutubeVideoCategoryVideoMode? @default(horizontal)
+  format720p         Boolean                        @default(false)
+
+  @@map("youtube_video_category")
+}
+
+model YoutubeAuthor {
+  id           Int                        @id @default(autoincrement()) @db.UnsignedInt
+  categoryId   Int                        @default(0)
+  userName     String                     @unique(map: "userName") @db.VarChar(64)
+  channelId    String?                    @db.VarChar(64)
+  scrapeStatus YoutubeAuthorScrapeStatus? @default(waiting)
+  totalVideo   Int                        @default(0)
+  scrapedTime  DateTime?                  @db.DateTime(0)
+  status       YoutubeAuthorStatus?       @default(enable)
+  skipBeginMs  Int                        @default(0)
+  skipEndMs    Int                        @default(0)
+
+  @@map("youtube_author")
+}
+
+model MidjourneyPaidAccount {
+  id           Int                          @id @default(autoincrement()) @db.UnsignedInt
+  serverId     String                       @db.VarChar(64)
+  channelId    String                       @db.VarChar(64)
+  accountToken String                       @db.VarChar(128)
+  status       MidjourneyPaidAccountStatus? @default(on)
+  errTimes     Int                          @default(0)
+  type         MidjourneyPaidAccountType    @default(premium)
+
+  @@map("midjourney_paid_account")
+}
+
+model MidjourneyTask {
+  id               Int                       @id @default(autoincrement()) @db.UnsignedInt
+  uuid             String                    @unique(map: "uuid") @db.VarChar(36)
+  accountId        Int?
+  prompt           String?                   @db.MediumText
+  type             MidjourneyTaskType        @default(imagine)
+  index            Int?                      @db.TinyInt
+  fromTaskId       Int?
+  messageId        String?                   @unique(map: "messageId") @db.VarChar(64)
+  messageHash      String?                   @db.VarChar(64)
+  status           MidjourneyTaskStatus?     @default(waiting)
+  imageUrl         String?                   @db.VarChar(256)
+  createdAt        DateTime                  @default(now()) @db.DateTime(6)
+  updatedAt        DateTime                  @default(now()) @db.DateTime(6)
+  imageCosLocation String?                   @db.VarChar(128)
+  client           MidjourneyTaskClient      @default(mj_test)
+  accountType      MidjourneyTaskAccountType @default(premium)
+  imageGridNumber  Int?                      @db.TinyInt
+  origPrompt       String?                   @db.MediumText
+  jobMessageId     String?                   @db.VarChar(64)
+  components       String?                   @db.VarChar(2048)
+
+  @@map("midjourney_task")
+}
+
+model YoutubeVideoSegment {
+  id               Int                                  @id @default(autoincrement()) @db.UnsignedInt
+  categoryId       Int
+  source           YoutubeVideoSegmentSource            @default(youtube)
+  videoId          Int
+  startMs          Int?
+  endMs            Int?
+  videoIndex       Int?
+  durationMs       Int?
+  width            Int
+  height           Int
+  quality          String?                              @db.VarChar(32)
+  contentLength    String?                              @db.VarChar(32)
+  useTimes         Int                                  @default(0)
+  cosLocation      String?                              @db.VarChar(128)
+  externalUniqId   String?                              @db.VarChar(32)
+  externalUrl      String?                              @db.VarChar(256)
+  preprocessStatus YoutubeVideoSegmentPreprocessStatus? @default(idle)
+  format720p       String?                              @db.VarChar(128)
+  format1080p      String?                              @db.VarChar(128)
+  createdAt        DateTime                             @default(now()) @db.DateTime(6)
+  updatedAt        DateTime                             @default(now()) @db.DateTime(6)
+  enable           Boolean                              @default(true)
+
+  @@index([categoryId, durationMs, width, height, useTimes], map: "idx_video_segment_condition")
+  @@map("youtube_video_segment")
+}
+
+model YoutubePlaylist {
+  id           Int                          @id @default(autoincrement()) @db.UnsignedInt
+  categoryId   Int                          @default(0)
+  playlistId   String                       @unique(map: "userName") @db.VarChar(64)
+  scrapeStatus YoutubePlaylistScrapeStatus? @default(waiting)
+  totalVideo   Int                          @default(0)
+  scrapedTime  DateTime?                    @db.DateTime(0)
+  status       YoutubePlaylistStatus?       @default(enable)
+
+  @@map("youtube_playlist")
+}
+
+enum email_status {
+  newly
+  using
+  used
+  expired
+}
+
+enum openai_account_status {
+  newly
+  suspended
+  in_pool
+  no_balance
+  sold_out
+}
+
+enum MidjourneyTaskType {
+  imagine
+  variation
+  upscale
+}
+
+enum MidjourneyPaidAccountStatus {
+  on
+  off
+}
+
+enum MidjourneyTaskStatus {
+  waiting
+  started
+  completed
+  timeout
+}
+
+enum MidjourneyTaskClient {
+  mj_test
+  mj_prod
+}
+
+enum MidjourneyPaidAccountType {
+  free
+  premium
+}
+
+enum MidjourneyTaskAccountType {
+  free
+  premium
+}
+
+enum YoutubeVideoPreprocessStatus {
+  waiting
+  queuing
+  completed
+}
+
+enum YoutubeVideoSyncStatus {
+  waiting
+  queuing
+  completed
+  failed
+}
+
+enum YoutubeVideoSegmentSource {
+  youtube
+  qidianyun
+}
+
+enum YoutubeAuthorStatus {
+  enable
+  disable
+}
+
+enum YoutubeVideoCategorySource {
+  default
+  qidianyun
+}
+
+enum YoutubeVideoCategoryVideoMode {
+  horizontal
+  vertical
+}
+
+enum YoutubePlaylistScrapeStatus {
+  waiting
+  queuing
+  completed
+}
+
+enum YoutubePlaylistStatus {
+  enable
+  disable
+}
+
+enum YoutubeAuthorScrapeStatus {
+  waiting
+  queuing
+  completed
+  noneed
+}
+
+enum YoutubeVideoSegmentPreprocessStatus {
+  idle
+  queuing
+  precessing
+}

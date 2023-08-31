@@ -1,0 +1,13 @@
+{
+    "apps": [
+        {
+            "name": "task-generator",
+            "namespace": "legendary",
+            "script": "dist/apps/task-generator/main.js",
+            "error_file": "logs/task-generator/err.log",
+            "out_file": "logs/task-generator/out.log",
+            "merge_logs": true,
+            "instances": 1
+        }
+    ]
+}

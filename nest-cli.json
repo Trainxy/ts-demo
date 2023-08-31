@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json.schemastore.org/nest-cli",
+  "collection": "@nestjs/schematics",
+  "sourceRoot": "apps/email/src",
+  "projects": {
+    "lengendary": {
+      "type": "library",
+      "root": "libs/lengendary",
+      "entryFile": "index",
+      "sourceRoot": "libs/lengendary/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/lengendary/tsconfig.lib.json"
+      }
+    },
+    "discord": {
+      "type": "application",
+      "root": "apps/discord",
+      "entryFile": "main",
+      "sourceRoot": "apps/discord/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/discord/tsconfig.app.json"
+      }
+    },
+    "task-generator": {
+      "type": "application",
+      "root": "apps/task-generator",
+      "entryFile": "main",
+      "sourceRoot": "apps/task-generator/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/task-generator/tsconfig.app.json"
+      }
+    }
+  },
+  "compilerOptions": {
+    "webpack": true,
+    "tsConfigPath": "apps/email/tsconfig.app.json"
+  },
+  "monorepo": true,
+  "root": "apps/email"
+}

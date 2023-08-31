@@ -1,0 +1,13 @@
+{
+    "apps": [
+        {
+            "name": "ai-art",
+            "namespace": "legendary",
+            "script": "dist/apps/ai-art/main.js",
+            "error_file": "logs/ai-art/err.log",
+            "out_file": "logs/ai-art/out.log",
+            "merge_logs": true,
+            "instances": 2
+        }
+    ]
+}

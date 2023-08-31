@@ -1,0 +1,13 @@
+{
+    "apps": [
+        {
+            "name": "midjourney",
+            "namespace": "legendary",
+            "script": "dist/apps/discord/main.js",
+            "error_file": "logs/midjourney/err.log",
+            "out_file": "logs/midjourney/out.log",
+            "merge_logs": true,
+            "instances": 2
+        }
+    ]
+}
